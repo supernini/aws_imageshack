@@ -1,13 +1,20 @@
 AwsImageshack
-=============
+===========
 
-Introduction goes here.
+v 0.1.0 : december 2010, first release
+
+see wiki for more detailled information : http://wiki.github.com/supernini/aws_imageshack/
 
 
 Example
 =======
 
-Example goes here.
+#in your controller, create an action and place this code
 
+<code>def upload_function
+  @image_shack = aws_imageshack(:options => {:size => 5, :position => 'top', :image => @image_shack, :width => 50}, :params => params, :api_key => '234DNUWX2e44a0a56a241f55b23bcb127a1061ca')
+  #save @image_shack, the url of the uploaded image
+end</code>
 
-Copyright (c) 2010 [name of plugin creator], released under the MIT license
+That all !
+
