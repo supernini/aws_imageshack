@@ -11,10 +11,10 @@ Example
 
 #in your controller, create an action and place this code
 
-<code>def upload_function
+def upload_function
   @image_shack = aws_imageshack(:options => {:size => 5, :position => 'top', :image => @image_shack, :width => 50}, :params => params, :api_key => '234DNUWX2e44a0a56a241f55b23bcb127a1061ca')
   #save @image_shack, the url of the uploaded image
-end</code>
+end
 
 That all !
 
