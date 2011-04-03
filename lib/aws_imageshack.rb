@@ -2,7 +2,7 @@ module AwsImageshack
   def self.included(base)
     base.extend(ClassMethods)
   end
-  # http://stream.imageshack.us/content.php?page=email&q=marketing&sub=XML%20API%20Request
+  
   module PublicControllerMethods
     def responds_to_parent(&block)
       yield 
@@ -37,9 +37,11 @@ with(window.parent) { setTimeout(function() { window.eval('#{self.class.helpers.
       @aws_options = options[:options]  
       if @aws_params[:aws] and @aws_params[:aws][:fileupload]
         image_link = aws_imageshack_save(@aws_params, @aws_api_key)
-        responds_to_parent do
-          render :update do |page|
-            page.replace 'aws_upload_form', :inline => aws_image_shack_form(image_link)
+        if image_link and @aws_params[:aws] and @aws_params[:aws][:fileupload_only]=='+'
+          responds_to_parent do
+            render :update do |page|
+              page.replace 'aws_upload_form', :inline => aws_image_shack_form(image_link)
+            end
           end
         end
         return image_link
@@ -48,8 +50,10 @@ with(window.parent) { setTimeout(function() { window.eval('#{self.class.helpers.
     
     def aws_imageshack_save(params, api_key)
       require "net/http"
-      require "net/http/post/multipart"
-    
+      require "net/http/post/multipart"      
+      if params[:aws][:fileupload] == ''
+        return nil
+      end    
       name = params[:aws][:fileupload].original_filename
       directory = 'tmp/uploads'
       `mkdir "#{directory}"` if !File.exists?(directory)
@@ -81,14 +85,18 @@ with(window.parent) { setTimeout(function() { window.eval('#{self.class.helpers.
       image_html = image_tag(image, :style => "float: #{@aws_options[:position]};width: #{@aws_options[:width]}px; height: #{@aws_options[:height]}px") if image
     
       content = ''
-      content += form_tag({:controller=> params[:controller], :action => params[:action]} , :id => 'aws_upload_form', :multipart => true, :target => 'aws_hidden_iframe', :style => 'text-align:center')
-      content += image_html+'</br>' if @aws_options[:position].downcase=='top'
-      content += file_field('aws', 'fileupload', :size => size, :class => class_css, :style => 'style_css', :onchange => "submit();")
-      content += '</br>'+image_html if @aws_options[:position].downcase!='top'
-      content += "<iframe id=\"aws_hidden_iframe\" name=\"aws_hidden_iframe\" style=\"display: none\"></iframe>"
-      content += "</form>"
+      content += form_tag({:controller=> params[:controller], :action => params[:action]} , :id => 'aws_upload_form', :multipart => true, :target => 'aws_hidden_iframe', :style => 'text-align:center')+"\n"
+      content += hidden_field('aws', 'fileupload_only', :value => '-')+"\n"
+      content += hidden_field(@aws_options[:field_object], @aws_options[:field_name], :value => image)+"\n" if image
+      content += image_html+'</br>' if @aws_options[:position].downcase=='top'+"\n"
+      content += file_field('aws', 'fileupload', :size => size, :class => class_css, :style => 'style_css', :onchange => "document.getElementById('aws_fileupload_only').value='+';document.getElementById('aws_upload_form').form.submit();")+"\n"
+      content += '</br>'+image_html if @aws_options[:position].downcase!='top'+"\n"
+      content += "<iframe id=\"aws_hidden_iframe\" name=\"aws_hidden_iframe\" style=\"display: none\"></iframe>"+"\n"
+      content += "</form>"+"\n"
       return content
     end
   end
 end
+ActionController::Base.helper AwsImageshack::ViewHelpersMethods
+ActionController::Base.send :include, AwsImageshack::PublicControllerMethods
 

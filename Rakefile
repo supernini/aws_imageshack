@@ -6,17 +6,6 @@ require 'rake/rdoctask'
 require 'rake/packagetask'
 require 'rake/gempackagetask'
 
-desc 'Default: run unit tests.'
-task :default => :test
-
-desc 'Test the aws_imageshack plugin.'
-Rake::TestTask.new(:test) do |t|
-  t.libs << 'lib'
-  t.libs << 'test'
-  t.pattern = 'test/**/*_test.rb'
-  t.verbose = true
-end
-
 desc 'Generate documentation for the aws_imageshack plugin.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
@@ -28,12 +17,17 @@ end
 
 spec = Gem::Specification.new do |s|
   s.name = "aws_imageshack"
-  s.version = "0.1.0"
+  s.version = "0.4.0"
   s.author = "Denis FABIEN"
   s.email = "denis@miseajour.net"
+  s.add_dependency('multipart-post')
   s.homepage = "http://www.miseajour.net/une-gem-pour-surveiller-la-modification-des-champs.html"
   s.platform = Gem::Platform::RUBY
   s.summary = "Use ImageShack to host your image, with un ajax upload form"
+  s.description = <<-EOF
+    The gem allow to use imageshack to host your images. You just need to require and API key on imageshack
+  EOF
+
   s.files = FileList[
 								'[a-zA-Z]*',
 							  'lib/**/*']

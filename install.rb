@@ -1,1 +1,3 @@
-# Install hook code here
+`sudo gem install multipart-post`
+puts "\n\n" + File.read(File.dirname(__FILE__) + '/README')
+
